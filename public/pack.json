@@ -1,0 +1,26 @@
+{
+  "preload": {
+    "files": [
+      {
+        "type": "image",
+        "key": "egg",
+        "url": "./images/egg.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_red",
+        "url": "./images/egg_red.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_blue",
+        "url": "./images/egg_blue.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_green",
+        "url": "./images/egg_green.png"
+      }
+    ]
+  }
+}

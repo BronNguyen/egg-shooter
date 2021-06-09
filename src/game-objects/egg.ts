@@ -12,6 +12,7 @@ export class Egg extends Physics.Arcade.Image {
     this.setCircle(25.1 * Math.sqrt(3)/2);
     //a = 32 Radius of the inner circle: R = a * sqrt(3)/2
     this.body.setOffset(25.1-25.1 * Math.sqrt(3)/2,25.1-25.1 * Math.sqrt(3)/2);
+    this.setCollideWorldBounds();
   }
 
   explode() {

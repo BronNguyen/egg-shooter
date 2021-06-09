@@ -3,9 +3,17 @@ import { IEggContainerContructor } from "~/const/egg.container.interface";
 import { Egg } from "./egg";
 
 export default class EggContainer extends Phaser.GameObjects.Container {
-  egg!: Egg;
+  private egg!: Egg;
+  hasEgg: boolean;
+  iIndex!: number;
+  jIndex!: number;
+  line: number;
   constructor(aParams: IEggContainerContructor) {
     super(aParams.scene, aParams.x, aParams.y);
+    this.line = aParams.line;
+    this.iIndex = aParams.iIndex;
+    this.jIndex = aParams.jIndex;
+    this.hasEgg = false;
     this.scene.add.existing(this);
   }
 
@@ -24,12 +32,15 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   addEgg(egg: Egg): void {
     this.egg = egg;
     this.add(egg);
+    this.hasEgg = true;
   }
 
-  addPhysics() {
-    this.scene.physics.add.existing(this, true);
-    this.body = (<Phaser.Physics.Arcade.Body>this.body)
+  private addPhysics() {
+    this.scene.physics.add.existing(this);
+    this.body = (<Phaser.Physics.Arcade.Body>this.body);
+    this.body.allowGravity = false;
+    this.body.immovable = true;
     this.body.setCircle(25);
-    this.body.setOffset(5,5);
+    this.body.setOffset(-25,-25);
   }
 }

@@ -11,6 +11,7 @@ export default class EggProjectile extends Egg {
 
   fire(directionVector: Phaser.Math.Vector2): void {
     this.initBody();
+    this.setBounce(1);
     const body = <Phaser.Physics.Arcade.Body>this.body;
     body.allowGravity = false;
     // console.log(directionVector.x/directionVector.y);

@@ -3,7 +3,7 @@ import { IEggContainerContructor } from "~/const/egg.container.interface";
 import { Egg } from "./egg";
 
 export default class EggContainer extends Phaser.GameObjects.Container {
-  private egg!: Egg;
+  egg!: Egg;
   hasEgg: boolean;
   iIndex!: number;
   jIndex!: number;
@@ -26,13 +26,20 @@ export default class EggContainer extends Phaser.GameObjects.Container {
         texture: CONST.texture + frame,
     }).setOrigin(0.5,0.5);
     this.addEgg(egg);
-    this.addPhysics();
   }
 
   addEgg(egg: Egg): void {
     this.egg = egg;
     this.add(egg);
     this.hasEgg = true;
+    this.addPhysics();
+  }
+
+  destroyEgg() {
+    // (<Phaser.Physics.Arcade.Body>this.body).enable = false;
+    (<Phaser.Physics.Arcade.Body>this.body).setEnable(false);
+    this.egg.destroy();
+    this.hasEgg = false;
   }
 
   private addPhysics() {

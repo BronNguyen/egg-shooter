@@ -36,18 +36,17 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   }
 
   destroyEgg() {
-    // (<Phaser.Physics.Arcade.Body>this.body).enable = false;
-    (<Phaser.Physics.Arcade.Body>this.body).setEnable(false);
+    (<Phaser.Physics.Arcade.Body>this.egg.body).destroy();
     this.egg.destroy();
     this.hasEgg = false;
   }
 
   private addPhysics() {
-    this.scene.physics.add.existing(this);
-    this.body = (<Phaser.Physics.Arcade.Body>this.body);
-    this.body.allowGravity = false;
-    this.body.immovable = true;
-    this.body.setCircle(25);
-    this.body.setOffset(-25,-25);
+    this.scene.physics.add.existing(this.egg);
+    this.egg.body = (<Phaser.Physics.Arcade.Body>this.egg.body);
+    this.egg.body.allowGravity = false;
+    this.egg.body.immovable = true;
+    this.egg.body.setCircle(25);
+    this.egg.body.setOffset(0,5);
   }
 }

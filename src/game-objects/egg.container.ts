@@ -20,19 +20,20 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   generateRandomEgg(colorsNumber: number) {
     const frame = CONST.frames[Phaser.Math.RND.between(0, colorsNumber - 1)];
     const egg = new Egg({
-        scene: this.scene,
-        x: 0,
-        y: 0,
-        texture: CONST.texture + frame,
-    }).setOrigin(0.5,0.5);
+      scene: this.scene,
+      x: 0,
+      y: 0,
+      texture: CONST.texture + frame,
+    }).setOrigin(0.5, 0.5);
     this.addEgg(egg);
   }
 
-  addEgg(egg: Egg): void {
+  addEgg(egg: Egg): Egg {
     this.egg = egg;
     this.add(egg);
     this.hasEgg = true;
     this.addPhysics();
+    return this.egg;
   }
 
   destroyEgg() {
@@ -43,10 +44,10 @@ export default class EggContainer extends Phaser.GameObjects.Container {
 
   private addPhysics() {
     this.scene.physics.add.existing(this.egg);
-    this.egg.body = (<Phaser.Physics.Arcade.Body>this.egg.body);
+    this.egg.body = <Phaser.Physics.Arcade.Body>this.egg.body;
     this.egg.body.allowGravity = false;
     this.egg.body.immovable = true;
     this.egg.body.setCircle(25);
-    this.egg.body.setOffset(0,5);
+    this.egg.body.setOffset(0, 5);
   }
 }

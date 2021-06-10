@@ -3,6 +3,8 @@ export let CONST = {
   highScore: 0,
   shootingPointx: 400,
   shootingPointy: 500,
+  standbyPointX: 500,
+  standbyPointY: 500,
   eggWidth: 50,
   eggHeight: 50,
   eggMapLength: 16,

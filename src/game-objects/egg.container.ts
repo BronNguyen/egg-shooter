@@ -7,6 +7,7 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   hasEgg: boolean;
   iIndex!: number;
   jIndex!: number;
+  connected: boolean;
   line: number;
   constructor(aParams: IEggContainerContructor) {
     super(aParams.scene, aParams.x, aParams.y);
@@ -14,6 +15,7 @@ export default class EggContainer extends Phaser.GameObjects.Container {
     this.iIndex = aParams.iIndex;
     this.jIndex = aParams.jIndex;
     this.hasEgg = false;
+    this.connected = false;
     this.scene.add.existing(this);
   }
 
@@ -41,6 +43,7 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   }
 
   dropEgg() {
+    if(!this.hasEgg) return;
     const txt = (<Egg>this.egg).texture.key;
     this.killEgg(txt);
   }

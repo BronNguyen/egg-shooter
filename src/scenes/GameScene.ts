@@ -1,7 +1,7 @@
 import { Egg } from "../game-objects/egg";
 import { CONST } from "../const/const";
 import EggContainer from "../game-objects/egg.container";
-import EggProjectile from "../game-objects/egg.projective";
+import EggProjectile from "../game-objects/egg.projectile";
 import Arrow from "../game-objects/arrow";
 
 export default class GameScene extends Phaser.Scene {
@@ -11,6 +11,7 @@ export default class GameScene extends Phaser.Scene {
   eggsPerRow!: number;
   eggBulletsStack!: string[];
   eggContainers!: EggContainer[][];
+  explodedEggContainers: EggContainer[] = [];
   readyBullet!: Phaser.GameObjects.Image;
   standbyBullet!: Phaser.GameObjects.Image;
 
@@ -193,39 +194,110 @@ export default class GameScene extends Phaser.Scene {
       (<Egg>eggContainer.egg).texture.key === texture
     ) {
       eggContainer.destroyEgg();
+      this.explodedEggContainers.push(eggContainer);
       this.nearbyContainers(eggContainer)
         // .filter((eggcontainer) => eggcontainer && eggcontainer.hasEgg)
         .forEach((element) => this.explode(element, texture));
     }
   }
 
-  private nearbyContainers(egg: EggContainer): EggContainer[] {
-    const i = egg.iIndex;
-    const j = egg.jIndex;
-    const line = egg.line;
+  private drop() {
+    if (this.explodedEggContainers.length == 0) return;
+    const nextToTop = this.eggContainers[this.highestEgg().iIndex];
+    nextToTop.filter(cont=>cont.hasEgg).forEach((eggCont) => {
+      this.setConnected(eggCont);
+    });
+    this.eggContainers.filter((eggConts, i, array)=>{
+      return i < this.highestEgg().iIndex? eggConts: false
+    }).map((eggContainerArray, i)=> {
+      console.log(i);
+      eggContainerArray.filter(eggCont=>eggCont.hasEgg && !eggCont.connected).forEach(eggCont =>{
+        eggCont.dropEgg();
+      })
+    })
+    this.explodedEggContainers = [];
+    this.eggContainers.forEach((eggConts)=>{
+      eggConts.forEach(eggCont => {
+        eggCont.connected = false;
+      });
+    })
+  }
+
+  private highestEgg(): EggContainer {
+    return this.explodedEggContainers.reduce((eggA, eggB) => {
+      return eggA.iIndex >= eggB.iIndex ? eggA : eggB;
+    });
+  }
+
+  private setConnected(eggCont: EggContainer) {
+    eggCont.connected = true;
+    const bellowedContainers = this.bellowedContainers(eggCont);
+    for (let i = 0; i < bellowedContainers.length; i++) {
+      this.setConnected(bellowedContainers[i]);
+    }
+  }
+
+  private bellowedContainers(eggCont: EggContainer): EggContainer[] {
+    const i = eggCont.iIndex;
+    const j = eggCont.jIndex;
+    const line = eggCont.line;
+    const bellowedEggs: EggContainer[] = [];
+    if (line === 9) {
+      bellowedEggs.push(this.eggContainers[i - 1][j]);
+      bellowedEggs.push(this.eggContainers[i - 1][j - 1]);
+    } else {
+      //even line
+      bellowedEggs.push(this.eggContainers[i - 1][j]);
+      bellowedEggs.push(this.eggContainers[i - 1][j + 1]);
+    }
+    bellowedEggs.push(this.eggContainers[i][j - 1]);
+    bellowedEggs.push(this.eggContainers[i][j + 1]);
+    return bellowedEggs.filter((eggCont) => eggCont && eggCont.hasEgg && !eggCont.connected);
+  }
+
+  private getUpperContainers(eggCont: EggContainer): EggContainer[] {
+    const i = eggCont.iIndex;
+    const j = eggCont.jIndex;
+    const line = eggCont.line;
+    const upperEggs: EggContainer[] = [];
+    // temp condition for odd
+    if (line === 9) {
+      upperEggs.push(this.eggContainers[i + 1][j - 1]);
+      upperEggs.push(this.eggContainers[i + 1][j]);
+    } else {
+      //even line
+      upperEggs.push(this.eggContainers[i + 1][j]);
+      upperEggs.push(this.eggContainers[i + 1][j + 1]);
+    }
+    return upperEggs.filter((eggCont) => eggCont.hasEgg);
+  }
+
+  private nearbyContainers(eggCont: EggContainer): EggContainer[] {
+    const i = eggCont.iIndex;
+    const j = eggCont.jIndex;
+    const line = eggCont.line;
     const nearbyEggs: EggContainer[] = [];
     // temp condition for odd
     if (line === 9) {
       nearbyEggs.push(this.eggContainers[i - 1][j]);
       nearbyEggs.push(this.eggContainers[i - 1][j - 1]);
-      nearbyEggs.push(this.eggContainers[i][j - 1]);
-      nearbyEggs.push(this.eggContainers[i][j + 1]);
       nearbyEggs.push(this.eggContainers[i + 1][j - 1]);
       nearbyEggs.push(this.eggContainers[i + 1][j]);
     } else {
       //even line
       nearbyEggs.push(this.eggContainers[i - 1][j]);
       nearbyEggs.push(this.eggContainers[i - 1][j + 1]);
-      nearbyEggs.push(this.eggContainers[i][j - 1]);
-      nearbyEggs.push(this.eggContainers[i][j + 1]);
       nearbyEggs.push(this.eggContainers[i + 1][j]);
       nearbyEggs.push(this.eggContainers[i + 1][j + 1]);
     }
+    nearbyEggs.push(this.eggContainers[i][j - 1]);
+    nearbyEggs.push(this.eggContainers[i][j + 1]);
     return nearbyEggs;
   }
 
   update() {
     this.eggContainersGroup.incY(0.3);
+    this.drop();
     if (this.eggContainers[0][0].y > CONST.shootingPointy) {
       this.eggContainers[0].forEach((container) => {
         container.destroy();

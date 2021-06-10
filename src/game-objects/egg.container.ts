@@ -3,7 +3,7 @@ import { IEggContainerContructor } from "~/const/egg.container.interface";
 import { Egg } from "./egg";
 
 export default class EggContainer extends Phaser.GameObjects.Container {
-  egg!: Egg;
+  egg: Egg | undefined;
   hasEgg: boolean;
   iIndex!: number;
   jIndex!: number;
@@ -37,17 +37,39 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   }
 
   destroyEgg() {
-    (<Phaser.Physics.Arcade.Body>this.egg.body).destroy();
-    this.egg.destroy();
-    this.hasEgg = false;
+    if (this.egg) {
+      (<Phaser.Physics.Arcade.Body>this.egg.body).destroy();
+      this.egg.destroy();
+      this.egg = undefined;
+      this.hasEgg = false;
+    }
+  }
+
+  dropEgg() {
+    if (this.egg) {
+      const txt = this.egg.texture.key;
+      (<Phaser.Physics.Arcade.Body>this.egg.body).destroy();
+      this.egg.destroy();
+      this.egg = undefined;
+      this.hasEgg = false;
+      const fallingEgg = this.scene.add.existing(new Egg({
+        x: this.x,
+        y: this.y,
+        scene: this.scene,
+        texture: txt,
+      }))
+      this.scene.physics.world.enable(fallingEgg);
+    }
   }
 
   private addPhysics() {
-    this.scene.physics.add.existing(this.egg);
-    this.egg.body = <Phaser.Physics.Arcade.Body>this.egg.body;
-    this.egg.body.allowGravity = false;
-    this.egg.body.immovable = true;
-    this.egg.body.setCircle(25);
-    this.egg.body.setOffset(0, 5);
+    if (this.egg) {
+      this.scene.physics.add.existing(this.egg);
+      this.egg.body = <Phaser.Physics.Arcade.Body>this.egg.body;
+      this.egg.body.allowGravity = false;
+      this.egg.body.immovable = true;
+      this.egg.body.setCircle(25);
+      this.egg.body.setOffset(0, 5);
+    }
   }
 }

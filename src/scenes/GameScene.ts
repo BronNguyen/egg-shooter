@@ -9,13 +9,10 @@ export default class GameScene extends Phaser.Scene {
   eggContainersGroup!: Phaser.GameObjects.Group;
   eggsProjectileGroup!: Phaser.GameObjects.Group;
   eggsPerRow!: number;
-  eggs: Egg[] = [];
-  eggsMagazine!: string[];
-  eggsLinks!: Egg[][];
+  eggBulletsStack!: string[];
   eggContainers!: EggContainer[][];
   readyBullet!: Phaser.GameObjects.Image;
   standbyBullet!: Phaser.GameObjects.Image;
-  hey = 0;
 
   constructor() {
     super("GameScene");
@@ -43,28 +40,28 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private initEggBulletImages() {
-    this.eggsMagazine = [];
+    this.eggBulletsStack = [];
     this.loadBullets();
     this.readyBullet = this.add.image(
       CONST.shootingPointx,
       CONST.shootingPointy,
-      CONST.texture + this.eggsMagazine[0]
+      CONST.texture + this.eggBulletsStack[0]
     );
     this.standbyBullet = this.add
       .image(
         CONST.standbyPointX,
         CONST.standbyPointY,
-        CONST.texture + this.eggsMagazine[1]
+        CONST.texture + this.eggBulletsStack[1]
       )
       .setScale(0.7);
   }
 
   private handleFire() {
     this.events.on("FIRE", (directionVector) => {
-      const frame = this.eggsMagazine.shift();
+      const frame = this.eggBulletsStack.shift();
       this.loadBullets();
-      this.readyBullet.setTexture(CONST.texture + this.eggsMagazine[0]);
-      this.standbyBullet.setTexture(CONST.texture + this.eggsMagazine[1]);
+      this.readyBullet.setTexture(CONST.texture + this.eggBulletsStack[0]);
+      this.standbyBullet.setTexture(CONST.texture + this.eggBulletsStack[1]);
       this.eggsProjectileGroup.add(
         this.add.existing(
           new EggProjectile(
@@ -82,11 +79,11 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private loadBullets(colorsNumber?: number) {
-    if (this.eggsMagazine.length == 0) {
-      this.eggsMagazine.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
-      this.eggsMagazine.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
+    if (this.eggBulletsStack.length == 0) {
+      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
+      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
     } else {
-      this.eggsMagazine.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
+      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
     }
   }
 
@@ -118,7 +115,7 @@ export default class GameScene extends Phaser.Scene {
   private eggLineInit(eggContainerArray: EggContainer[]): void {
     eggContainerArray.forEach((eggContainer) => {
       eggContainer.generateRandomEgg(3);
-      this.eggsGroup.add(eggContainer.egg);
+      this.eggsGroup.add(<Egg>eggContainer.egg);
     });
   }
 
@@ -141,7 +138,11 @@ export default class GameScene extends Phaser.Scene {
         const nearestCont = nearbyContainers
           .filter((obj) => obj != undefined)
           .filter((obj) => !obj.hasEgg)
-          .reduce((a, b) => (distance(a, _eggProjectile.body) < distance(b, _eggProjectile.body) ? a : b));
+          .reduce((a, b) =>
+            distance(a, _eggProjectile.body) < distance(b, _eggProjectile.body)
+              ? a
+              : b
+          );
         const newEgg = new Egg({
           x: 0,
           y: 0,
@@ -154,34 +155,32 @@ export default class GameScene extends Phaser.Scene {
         _eggProjectile.destroy();
         // explode
         if (this.colorMatch(nearestCont)) {
-          this.explode(nearestCont, nearestCont.egg.texture.key);
+          this.explode(nearestCont, (<Egg>nearestCont.egg).texture.key);
         }
       }
     );
   }
 
-  private colorMatch(
-    f0: EggContainer
-  ): boolean {
+  private colorMatch(f0: EggContainer): boolean {
     let colorMatch = 0;
     const f0s = this.nearbyContainers(f0);
     f0s.forEach((f1) => {
       if (
         f1 &&
         f1.hasEgg &&
-        f1.egg.texture.key === f0.egg.texture.key
+        (<Egg>f1.egg).texture.key === (<Egg>f0.egg).texture.key
       ) {
         colorMatch += 1;
-        this.nearbyContainers(f1).forEach((f2)=> {
-          if(
+        this.nearbyContainers(f1).forEach((f2) => {
+          if (
             f2 &&
             f2.hasEgg &&
             f2 != f0 &&
-            f2.egg.texture.key  === f0.egg.texture.key
+            (<Egg>f2.egg).texture.key === (<Egg>f0.egg).texture.key
           ) {
             colorMatch += 1;
           }
-        })
+        });
       }
     });
     return colorMatch > 1 ? true : false;
@@ -191,7 +190,7 @@ export default class GameScene extends Phaser.Scene {
     if (
       eggContainer &&
       eggContainer.hasEgg &&
-      eggContainer.egg.texture.key === texture
+      (<Egg>eggContainer.egg).texture.key === texture
     ) {
       eggContainer.destroyEgg();
       this.nearbyContainers(eggContainer)

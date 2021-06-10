@@ -7,7 +7,7 @@ export let CONST = {
   standbyPointY: 500,
   eggWidth: 50,
   eggHeight: 50,
-  eggMapLength: 16,
+  eggMapLength: 28,
   worldWidth: 50 * 9,
   worldHeight: Infinity,
   texture: "egg_",

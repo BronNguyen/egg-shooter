@@ -20,6 +20,11 @@
         "type": "image",
         "key": "egg_green",
         "url": "./images/egg_green.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_fried",
+        "url": "./images/egg_fried.png"
       }
     ]
   }

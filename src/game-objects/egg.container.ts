@@ -37,17 +37,16 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   }
 
   destroyEgg() {
-    if (this.egg) {
-      (<Phaser.Physics.Arcade.Body>this.egg.body).destroy();
-      this.egg.destroy();
-      this.egg = undefined;
-      this.hasEgg = false;
-    }
+    this.killEgg('egg_fried');
   }
 
   dropEgg() {
+    const txt = (<Egg>this.egg).texture.key;
+    this.killEgg(txt);
+  }
+
+  killEgg(texture: string) {
     if (this.egg) {
-      const txt = this.egg.texture.key;
       (<Phaser.Physics.Arcade.Body>this.egg.body).destroy();
       this.egg.destroy();
       this.egg = undefined;
@@ -56,9 +55,10 @@ export default class EggContainer extends Phaser.GameObjects.Container {
         x: this.x,
         y: this.y,
         scene: this.scene,
-        texture: txt,
+        texture: texture,
       }))
       this.scene.physics.world.enable(fallingEgg);
+      (<Phaser.Physics.Arcade.Body>fallingEgg.body).setVelocityY(600);
     }
   }
 

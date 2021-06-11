@@ -24,4 +24,9 @@ export let CONST = {
     "orange",
     "yellow",
   ],
+  colors: [
+    0xFF0000,
+    0x0000FF,
+    0x00ff00,
+  ]
 };

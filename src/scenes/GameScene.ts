@@ -13,8 +13,10 @@ export default class GameScene extends Phaser.Scene {
   eggContainers!: EggContainer[][];
   explodedEggContainers: EggContainer[] = [];
   eggBulletsStack!: string[];
+  colorsStack!: number[];
   readyBullet!: Phaser.GameObjects.Image;
   standbyBullet!: Phaser.GameObjects.Image;
+
   level = 3;
 
   constructor() {
@@ -49,6 +51,7 @@ export default class GameScene extends Phaser.Scene {
 
   private initEggBulletImages() {
     this.eggBulletsStack = [];
+    this.colorsStack = [];
     this.loadBullets();
     this.readyBullet = this.add.image(
       CONST.shootingPointx,
@@ -67,6 +70,8 @@ export default class GameScene extends Phaser.Scene {
   private handleFire() {
     this.events.on("FIRE", (directionVector) => {
       const frame = this.eggBulletsStack.shift();
+      // delete the to generate the new color
+      this.colorsStack.shift();
       this.loadBullets();
       this.readyBullet.setTexture(CONST.texture + this.eggBulletsStack[0]);
       this.standbyBullet.setTexture(CONST.texture + this.eggBulletsStack[1]);
@@ -87,11 +92,16 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private loadBullets(colorsNumber?: number) {
+    const randomNumber1 = Phaser.Math.RND.between(0, 2);
     if (this.eggBulletsStack.length == 0) {
-      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
-      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
+      const randomNumber2 = Phaser.Math.RND.between(0, 2);
+      this.eggBulletsStack.push(CONST.frames[randomNumber1]);
+      this.eggBulletsStack.push(CONST.frames[randomNumber2]);
+      this.colorsStack.push(CONST.colors[randomNumber1]);
+      this.colorsStack.push(CONST.colors[randomNumber2]);
     } else {
-      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
+      this.eggBulletsStack.push(CONST.frames[randomNumber1]);
+      this.colorsStack.push(CONST.colors[randomNumber1]);
     }
   }
 

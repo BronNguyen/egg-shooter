@@ -15,7 +15,7 @@ export default class Arrow extends Phaser.GameObjects.Graphics {
     this.line = new Phaser.Geom.Line();
     this.triangle = new Phaser.Geom.Triangle();
     this.init();
-    this.setDepth(1);
+    this.setDepth(-1);
     this.setAlpha(1);
   }
 
@@ -57,7 +57,7 @@ export default class Arrow extends Phaser.GameObjects.Graphics {
     Phaser.Geom.Triangle.Rotate(this.triangle,normalAngle-0.5);
 
     this.clear();
-    this.lineStyle(CONST.eggWidth, color);
+    this.lineStyle(CONST.eggWidth/3*2, color);
     this.strokeLineShape(this.line);
     this.fillStyle(color);
     this.fillTriangleShape(this.triangle);

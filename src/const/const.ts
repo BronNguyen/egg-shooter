@@ -9,8 +9,8 @@ export let CONST = {
   eggHeight: 50,
   eggMapLength: 28,
   worldLeftBound: 140,
-  worldRightBound: 640,
-  worldWidth: 50 * 9,
+  worldRightBound: 600,
+  // worldWidth: 50 * 9,
   worldHeight: Infinity,
   texture: "egg_",
   frames: [

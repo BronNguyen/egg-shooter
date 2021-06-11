@@ -168,6 +168,8 @@ export default class GameScene extends Phaser.Scene {
         const nearbyContainers = this.nearbyContainers(
           <EggContainer>_egg.parentContainer
         );
+        console.log(this.eggsGroup,"egggroup");
+        console.log(_egg,"egg");
         const nearestCont = nearbyContainers
           .filter((obj) => obj != undefined)
           .filter((obj) => !obj.hasEgg)
@@ -315,6 +317,7 @@ export default class GameScene extends Phaser.Scene {
     const row = this.nextRowGenerate(this.egglines)
     this.eggContainers.push(row);
     this.eggLineInit(row, this.level);
+    this.initCollider();
   }
 
   update() {

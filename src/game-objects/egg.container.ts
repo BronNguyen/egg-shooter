@@ -9,6 +9,7 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   jIndex!: number;
   connected: boolean;
   line: number;
+  point;
   constructor(aParams: IEggContainerContructor) {
     super(aParams.scene, aParams.x, aParams.y);
     this.line = aParams.line;
@@ -16,7 +17,12 @@ export default class EggContainer extends Phaser.GameObjects.Container {
     this.jIndex = aParams.jIndex;
     this.hasEgg = false;
     this.connected = false;
+    this.point = new Phaser.Geom.Point();
     this.scene.add.existing(this);
+    const graphics = new Phaser.GameObjects.Graphics(this.scene);
+    this.add(graphics);
+    graphics.fillStyle(0x2266aa);
+    graphics.fillPointShape(this.point,15);
   }
 
   generateRandomEgg(colorsNumber: number) {

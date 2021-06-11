@@ -7,7 +7,7 @@ export let CONST = {
   standbyPointY: 500,
   eggWidth: 50,
   eggHeight: 50,
-  eggMapLength: 0,
+  eggMapLength: 28,
   worldLeftBound: 140,
   worldRightBound: 640,
   worldWidth: 50 * 9,
@@ -24,4 +24,9 @@ export let CONST = {
     "orange",
     "yellow",
   ],
+  colors: [
+    0xFF0000,
+    0x0000FF,
+    0x00ff00,
+  ]
 };

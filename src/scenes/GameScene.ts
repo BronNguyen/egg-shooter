@@ -13,8 +13,10 @@ export default class GameScene extends Phaser.Scene {
   eggContainers!: EggContainer[][];
   explodedEggContainers: EggContainer[] = [];
   eggBulletsStack!: string[];
+  colorsStack!: number[];
   readyBullet!: Phaser.GameObjects.Image;
   standbyBullet!: Phaser.GameObjects.Image;
+
   level = 3;
 
   constructor() {
@@ -49,6 +51,7 @@ export default class GameScene extends Phaser.Scene {
 
   private initEggBulletImages() {
     this.eggBulletsStack = [];
+    this.colorsStack = [];
     this.loadBullets();
     this.readyBullet = this.add.image(
       CONST.shootingPointx,
@@ -67,6 +70,8 @@ export default class GameScene extends Phaser.Scene {
   private handleFire() {
     this.events.on("FIRE", (directionVector) => {
       const frame = this.eggBulletsStack.shift();
+      // delete the to generate the new color
+      this.colorsStack.shift();
       this.loadBullets();
       this.readyBullet.setTexture(CONST.texture + this.eggBulletsStack[0]);
       this.standbyBullet.setTexture(CONST.texture + this.eggBulletsStack[1]);
@@ -87,11 +92,16 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private loadBullets(colorsNumber?: number) {
+    const randomNumber1 = Phaser.Math.RND.between(0, 2);
     if (this.eggBulletsStack.length == 0) {
-      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
-      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
+      const randomNumber2 = Phaser.Math.RND.between(0, 2);
+      this.eggBulletsStack.push(CONST.frames[randomNumber1]);
+      this.eggBulletsStack.push(CONST.frames[randomNumber2]);
+      this.colorsStack.push(CONST.colors[randomNumber1]);
+      this.colorsStack.push(CONST.colors[randomNumber2]);
     } else {
-      this.eggBulletsStack.push(CONST.frames[Phaser.Math.RND.between(0, 2)]);
+      this.eggBulletsStack.push(CONST.frames[randomNumber1]);
+      this.colorsStack.push(CONST.colors[randomNumber1]);
     }
   }
 
@@ -225,6 +235,7 @@ export default class GameScene extends Phaser.Scene {
   private dropEggs() {
     if (this.explodedEggContainers.length == 0) return;
     const nextToTop = this.eggContainers[this.highestEgg().iIndex];
+    console.log(this.highestEgg().iIndex)
     nextToTop.filter(cont=>cont.hasEgg).forEach((eggCont) => {
       this.setConnected(eggCont);
     });
@@ -259,19 +270,19 @@ export default class GameScene extends Phaser.Scene {
 
   private bellowedContainers(eggCont: EggContainer): EggContainer[] {
     const i = eggCont.iIndex;
-    const j = eggCont.jIndex; 
+    const j = eggCont.jIndex;
     const line = eggCont.line;
     const bellowedEggs: EggContainer[] = [];
     if (line === 9) {
-      bellowedEggs.push(this.eggContainers[i - 1][j]);
-      bellowedEggs.push(this.eggContainers[i - 1][j - 1]);
+      this.eggContainers[i - 1]?bellowedEggs.push(this.eggContainers[i - 1][j]):true;
+      this.eggContainers[i - 1]?bellowedEggs.push(this.eggContainers[i - 1][j - 1]):true;
     } else {
       //even line
-      bellowedEggs.push(this.eggContainers[i - 1][j]);
-      bellowedEggs.push(this.eggContainers[i - 1][j + 1]);
+      this.eggContainers[i - 1]?bellowedEggs.push(this.eggContainers[i - 1][j]):true;
+      this.eggContainers[i - 1]?bellowedEggs.push(this.eggContainers[i - 1][j + 1]):true;
     }
-    bellowedEggs.push(this.eggContainers[i][j - 1]);
-    bellowedEggs.push(this.eggContainers[i][j + 1]);
+    this.eggContainers[i]?bellowedEggs.push(this.eggContainers[i][j - 1]):true;
+    this.eggContainers[i]?bellowedEggs.push(this.eggContainers[i][j + 1]):true;
     return bellowedEggs.filter((eggCont) => eggCont && eggCont.hasEgg && !eggCont.connected);
   }
 
@@ -282,19 +293,19 @@ export default class GameScene extends Phaser.Scene {
     const nearbyEggs: EggContainer[] = [];
     // condition for odd
     if (line === 9) {
-      nearbyEggs.push(this.eggContainers[i - 1][j]);
-      nearbyEggs.push(this.eggContainers[i - 1][j - 1]);
-      nearbyEggs.push(this.eggContainers[i + 1][j - 1]);
-      nearbyEggs.push(this.eggContainers[i + 1][j]);
+      this.eggContainers[i - 1]?nearbyEggs.push(this.eggContainers[i - 1][j]):true;
+      this.eggContainers[i - 1]?nearbyEggs.push(this.eggContainers[i - 1][j - 1]):true;
+      this.eggContainers[i + 1]?nearbyEggs.push(this.eggContainers[i + 1][j - 1]):true;
+      this.eggContainers[i + 1]?nearbyEggs.push(this.eggContainers[i + 1][j]):true;
     } else {
       //even line
-      nearbyEggs.push(this.eggContainers[i - 1][j]);
-      nearbyEggs.push(this.eggContainers[i - 1][j + 1]);
-      nearbyEggs.push(this.eggContainers[i + 1][j]);
-      nearbyEggs.push(this.eggContainers[i + 1][j + 1]);
+      this.eggContainers[i - 1]?nearbyEggs.push(this.eggContainers[i - 1][j]):true;
+      this.eggContainers[i - 1]?nearbyEggs.push(this.eggContainers[i - 1][j + 1]):true;
+      this.eggContainers[i + 1]?nearbyEggs.push(this.eggContainers[i + 1][j]):true;
+      this.eggContainers[i + 1]?nearbyEggs.push(this.eggContainers[i + 1][j + 1]):true;
     }
-    nearbyEggs.push(this.eggContainers[i][j - 1]);
-    nearbyEggs.push(this.eggContainers[i][j + 1]);
+    this.eggContainers[i]?nearbyEggs.push(this.eggContainers[i][j - 1]):true;
+    this.eggContainers[i]?nearbyEggs.push(this.eggContainers[i][j + 1]):true;
     return nearbyEggs;
   }
 
@@ -307,7 +318,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
-    this.eggContainersGroup.incY(0.5);
+    this.eggContainersGroup.incY(0.2);
     this.dropEggs();
     this.eggContainers.forEach((eggContainerArray,i) => {
       if(eggContainerArray.length > 0 && eggContainerArray[0].y >= CONST.shootingPointy + 100) {

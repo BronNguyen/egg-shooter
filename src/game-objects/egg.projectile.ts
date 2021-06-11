@@ -14,7 +14,7 @@ export default class EggProjectile extends Egg {
     this.setBounce(1);
     const body = <Phaser.Physics.Arcade.Body>this.body;
     body.allowGravity = false;
-    // console.log(directionVector.x/directionVector.y);
-    body.setVelocity(directionVector.x, directionVector.y);
+    const speed = -1200;
+    body.setVelocity(directionVector.x* speed, directionVector.y* speed);
   }
 }

@@ -7,7 +7,7 @@ export let CONST = {
   standbyPointY: 500,
   eggWidth: 50,
   eggHeight: 50,
-  eggMapLength: 28,
+  eggMapLength: 16,
   worldLeftBound: 140,
   worldRightBound: 600,
   // worldWidth: 50 * 9,

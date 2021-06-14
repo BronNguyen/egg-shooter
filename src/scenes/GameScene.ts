@@ -41,6 +41,7 @@ export default class GameScene extends Phaser.Scene {
     this.handleFire();
     this.initCollider();
     this.initLevelController();
+    this.eggsFactory();
   }
 
   private worldConfig() {
@@ -107,16 +108,16 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private initLevelController() {
-    this.time.delayedCall(30*1000,()=> {
+    this.time.delayedCall(30 * 1000, () => {
       this.level += 1;
       this.initLevelController();
-    })
+    });
   }
 
   private loadBullets(colorsNumber?: number) {
-    const randomNumber1 = Phaser.Math.RND.between(0, this.level-1);
+    const randomNumber1 = Phaser.Math.RND.between(0, this.level - 1);
     if (this.eggBulletsStack.length == 0) {
-      const randomNumber2 = Phaser.Math.RND.between(0, this.level-1);
+      const randomNumber2 = Phaser.Math.RND.between(0, this.level - 1);
       this.eggBulletsStack.push(CONST.frames[randomNumber1]);
       this.eggBulletsStack.push(CONST.frames[randomNumber2]);
       this.colorsStack.push(CONST.colors[randomNumber1]);
@@ -252,15 +253,21 @@ export default class GameScene extends Phaser.Scene {
     ) {
       eggContainer.destroyEgg();
       this.explodedEggContainers.push(eggContainer);
+      this.nearbyContainers(eggContainer).forEach((element) =>
+        this.explode(element, texture)
+      );
+    }
+  }
+
+  private eggsFactory() {
+    this.events.on("destroy-egg", () => {
+      console.log(this.eggsDestroyed)
       this.eggsDestroyed += 1;
       if (this.eggsDestroyed >= 17) {
         this.eggsDestroyed -= 17;
         this.generateRows();
       }
-      this.nearbyContainers(eggContainer).forEach((element) =>
-        this.explode(element, texture)
-      );
-    }
+    });
   }
 
   private generateRows() {
@@ -390,7 +397,7 @@ export default class GameScene extends Phaser.Scene {
     return nearbyEggs;
   }
 
-  private cyclingContainers(eggConts: EggContainer[]) {
+  private destroyLowContainers(eggConts: EggContainer[]) {
     eggConts.forEach((eggCont) => eggCont.destroy());
   }
 
@@ -402,7 +409,7 @@ export default class GameScene extends Phaser.Scene {
         eggContainerArray.length > 0 &&
         eggContainerArray[0].y >= CONST.shootingPointy + 100
       ) {
-        this.cyclingContainers(eggContainerArray);
+        this.destroyLowContainers(eggContainerArray);
         this.eggContainers[i] = [];
       }
     });

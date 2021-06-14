@@ -72,6 +72,7 @@ export default class EggContainer extends Phaser.GameObjects.Container {
       this.scene.time.delayedCall(3000,()=>{
         this.killFallingEgg(fallingEgg);
       })
+      this.scene.events.emit('destroy-egg');
     }
   }
 

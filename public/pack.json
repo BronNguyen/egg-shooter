@@ -23,6 +23,36 @@
       },
       {
         "type": "image",
+        "key": "egg_violet",
+        "url": "./images/egg_violet.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_pink",
+        "url": "./images/egg_pink.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_gray",
+        "url": "./images/egg_gray.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_black",
+        "url": "./images/egg_black.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_orange",
+        "url": "./images/egg_orange.png"
+      },
+      {
+        "type": "image",
+        "key": "egg_yellow",
+        "url": "./images/egg_yellow.png"
+      },
+      {
+        "type": "image",
         "key": "egg_fried",
         "url": "./images/egg_fried.png"
       }

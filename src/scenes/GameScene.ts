@@ -17,8 +17,7 @@ export default class GameScene extends Phaser.Scene {
   colorsStack!: number[];
   readyBullet!: Phaser.GameObjects.Image;
   standbyBullet!: Phaser.GameObjects.Image;
-
-  level = 3;
+  private level = 3;
 
   constructor() {
     super("GameScene");
@@ -34,13 +33,14 @@ export default class GameScene extends Phaser.Scene {
     this.drawWalls();
     this.eggContainersFirstInit();
     this.worldConfig();
-    for (let i = 4; i < this.egglines; i++) {
+    for (let i = 8; i < this.egglines; i++) {
       this.eggLineInit(this.eggContainers[i], this.level);
     }
     this.add.existing(new Arrow(this));
     this.initEggBulletImages();
     this.handleFire();
     this.initCollider();
+    this.initLevelController();
   }
 
   private worldConfig() {
@@ -51,7 +51,7 @@ export default class GameScene extends Phaser.Scene {
       Number.MAX_SAFE_INTEGER
     );
     this.cameras.main.setBackgroundColor(0xe6f7ff);
-    this.cameras.main.setZoom(0.5);
+    // this.cameras.main.setZoom(0.5);
   }
 
   private drawWalls() {
@@ -106,10 +106,17 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  private initLevelController() {
+    this.time.delayedCall(30*1000,()=> {
+      this.level += 1;
+      this.initLevelController();
+    })
+  }
+
   private loadBullets(colorsNumber?: number) {
-    const randomNumber1 = Phaser.Math.RND.between(0, 2);
+    const randomNumber1 = Phaser.Math.RND.between(0, this.level-1);
     if (this.eggBulletsStack.length == 0) {
-      const randomNumber2 = Phaser.Math.RND.between(0, 2);
+      const randomNumber2 = Phaser.Math.RND.between(0, this.level-1);
       this.eggBulletsStack.push(CONST.frames[randomNumber1]);
       this.eggBulletsStack.push(CONST.frames[randomNumber2]);
       this.colorsStack.push(CONST.colors[randomNumber1]);
@@ -127,7 +134,7 @@ export default class GameScene extends Phaser.Scene {
       eggsRow[j] = new EggContainer({
         scene: this,
         x: 200 + t * CONST.eggWidth,
-        y: 320 - i * CONST.eggHeight,
+        y: 520 - i * CONST.eggHeight,
         line: this.eggsPerRow,
         iIndex: i,
         jIndex: j,
@@ -265,7 +272,6 @@ export default class GameScene extends Phaser.Scene {
     this.eggContainers.push(nextRow);
     this.eggLineInit(nextRow, this.level);
     this.egglines += 1;
-    console.log(this.eggContainers);
   }
 
   private dropEggs() {
@@ -345,10 +351,6 @@ export default class GameScene extends Phaser.Scene {
     const i = eggCont.iIndex;
     const j = eggCont.jIndex;
     const line = eggCont.line;
-    console.log(i,"i",j,"j",line,"line");
-    console.log(eggCont,"eggcont");
-    console.log(this.eggContainers[i][j],'eggcont2');
-    console.log(this.eggContainers);
     const nearbyEggs: EggContainer[] = [];
     // condition for odd
     if (line === 9) {
@@ -385,9 +387,6 @@ export default class GameScene extends Phaser.Scene {
     this.eggContainers[i]
       ? nearbyEggs.push(this.eggContainers[i][j + 1])
       : true;
-    console.log(this.eggContainers[i-1],'i-1');
-    console.log(this.eggContainers[i-1][j],'j',this.eggContainers[i-1][j+1],'j+1',this.eggContainers[i-1][j-1],'j-1',)
-    console.log("eggcontainers",nearbyEggs);
     return nearbyEggs;
   }
 
@@ -396,7 +395,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
-    this.eggContainersGroup.incY(0.4);
+    this.eggContainersGroup.incY(0.3);
     this.dropEggs();
     this.eggContainers.forEach((eggContainerArray, i) => {
       if (

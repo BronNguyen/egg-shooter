@@ -19,10 +19,11 @@ export default class EggContainer extends Phaser.GameObjects.Container {
     this.connected = false;
     this.point = new Phaser.Geom.Point();
     this.scene.add.existing(this);
-    const graphics = new Phaser.GameObjects.Graphics(this.scene);
-    this.add(graphics);
-    graphics.fillStyle(0x2266aa);
-    graphics.fillPointShape(this.point,15);
+    // debug
+    // const graphics = new Phaser.GameObjects.Graphics(this.scene);
+    // this.add(graphics);
+    // graphics.fillStyle(0x2266aa);
+    // graphics.fillPointShape(this.point,15);
   }
 
   generateRandomEgg(colorsNumber: number) {
@@ -68,7 +69,15 @@ export default class EggContainer extends Phaser.GameObjects.Container {
       }))
       this.scene.physics.world.enable(fallingEgg);
       (<Phaser.Physics.Arcade.Body>fallingEgg.body).setVelocityY(600);
+      this.scene.time.delayedCall(3000,()=>{
+        this.killFallingEgg(fallingEgg);
+      })
     }
+  }
+
+  private killFallingEgg(fallingEgg:Egg) {
+    fallingEgg.body.destroy();
+    fallingEgg.destroy();
   }
 
   private addPhysics() {

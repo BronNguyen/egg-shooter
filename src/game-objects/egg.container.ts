@@ -55,7 +55,7 @@ export default class EggContainer extends Phaser.GameObjects.Container {
   }
 
   killEgg(texture: string) {
-    if (this.egg) {
+    if (this.egg && this.hasEgg) {
       (<Phaser.Physics.Arcade.Body>this.egg.body).destroy();
       this.egg.destroy();
       this.egg = undefined;

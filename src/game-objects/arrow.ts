@@ -51,7 +51,7 @@ export default class Arrow extends Phaser.GameObjects.Graphics {
     this.triangle = Phaser.Geom.Triangle.BuildEquilateral(
       this.line.x2,
       this.line.y2,
-      100
+      70
     );
     Phaser.Geom.Triangle.CenterOn(this.triangle,pointer.x, pointer.y);
     Phaser.Geom.Triangle.Rotate(this.triangle,normalAngle-0.5);

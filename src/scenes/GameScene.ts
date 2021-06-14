@@ -9,6 +9,7 @@ export default class GameScene extends Phaser.Scene {
   eggContainersGroup!: Phaser.GameObjects.Group;
   eggsProjectileGroup!: Phaser.GameObjects.Group;
   egglines!: number;
+  eggsDestroyed!: number;
   eggsPerRow!: number;
   eggContainers!: EggContainer[][];
   explodedEggContainers: EggContainer[] = [];
@@ -29,6 +30,7 @@ export default class GameScene extends Phaser.Scene {
     this.eggsProjectileGroup = this.add.group();
     this.egglines = CONST.eggMapLength;
     this.eggsPerRow = 9;
+    this.eggsDestroyed = 0;
     this.drawWalls();
     this.eggContainersFirstInit();
     this.worldConfig();
@@ -49,6 +51,7 @@ export default class GameScene extends Phaser.Scene {
       Number.MAX_SAFE_INTEGER
     );
     this.cameras.main.setBackgroundColor(0xe6f7ff);
+    this.cameras.main.setZoom(0.5);
   }
 
   private drawWalls() {
@@ -179,11 +182,10 @@ export default class GameScene extends Phaser.Scene {
       this.eggsProjectileGroup,
       this.eggsGroup,
       (_eggProjectile, _egg) => {
+        (<EggContainer>_egg.parentContainer).setAlpha(1);
         const nearbyContainers = this.nearbyContainers(
           <EggContainer>_egg.parentContainer
         );
-        console.log(this.eggsGroup,"egggroup");
-        console.log(_egg,"egg");
         const nearestCont = nearbyContainers
           .filter((obj) => obj != undefined)
           .filter((obj) => !obj.hasEgg)
@@ -243,16 +245,32 @@ export default class GameScene extends Phaser.Scene {
     ) {
       eggContainer.destroyEgg();
       this.explodedEggContainers.push(eggContainer);
+      this.eggsDestroyed += 1;
+      if (this.eggsDestroyed >= 17) {
+        this.eggsDestroyed -= 17;
+        this.generateRows();
+      }
       this.nearbyContainers(eggContainer).forEach((element) =>
         this.explode(element, texture)
       );
     }
   }
 
+  private generateRows() {
+    let row = this.nextRowGenerate(this.egglines);
+    this.eggContainers.push(row);
+    this.eggLineInit(row, this.level);
+    this.egglines += 1;
+    const nextRow = this.nextRowGenerate(this.egglines);
+    this.eggContainers.push(nextRow);
+    this.eggLineInit(nextRow, this.level);
+    this.egglines += 1;
+    console.log(this.eggContainers);
+  }
+
   private dropEggs() {
     if (this.explodedEggContainers.length == 0) return;
     const nextToTop = this.eggContainers[this.highestEgg().iIndex];
-    console.log(this.highestEgg().iIndex);
     nextToTop
       .filter((cont) => cont.hasEgg)
       .forEach((eggCont) => {
@@ -327,6 +345,10 @@ export default class GameScene extends Phaser.Scene {
     const i = eggCont.iIndex;
     const j = eggCont.jIndex;
     const line = eggCont.line;
+    console.log(i,"i",j,"j",line,"line");
+    console.log(eggCont,"eggcont");
+    console.log(this.eggContainers[i][j],'eggcont2');
+    console.log(this.eggContainers);
     const nearbyEggs: EggContainer[] = [];
     // condition for odd
     if (line === 9) {
@@ -363,20 +385,18 @@ export default class GameScene extends Phaser.Scene {
     this.eggContainers[i]
       ? nearbyEggs.push(this.eggContainers[i][j + 1])
       : true;
+    console.log(this.eggContainers[i-1],'i-1');
+    console.log(this.eggContainers[i-1][j],'j',this.eggContainers[i-1][j+1],'j+1',this.eggContainers[i-1][j-1],'j-1',)
+    console.log("eggcontainers",nearbyEggs);
     return nearbyEggs;
   }
 
   private cyclingContainers(eggConts: EggContainer[]) {
     eggConts.forEach((eggCont) => eggCont.destroy());
-    this.egglines += 1;
-    const row = this.nextRowGenerate(this.egglines);
-    this.eggContainers.push(row);
-    this.eggLineInit(row, this.level);
-    this.initCollider();
   }
 
   update() {
-    this.eggContainersGroup.incY(0.2);
+    this.eggContainersGroup.incY(0.4);
     this.dropEggs();
     this.eggContainers.forEach((eggContainerArray, i) => {
       if (
